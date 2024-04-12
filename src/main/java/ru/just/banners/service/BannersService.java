@@ -2,12 +2,10 @@ package ru.just.banners.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 import ru.just.banners.dto.BannerDto;
 import ru.just.banners.dto.BannerIdDto;
 import ru.just.banners.dto.CreateBannerDto;
-import ru.just.banners.model.BannerModel;
 import ru.just.banners.repository.BannersRepository;
 
 import java.util.Optional;
