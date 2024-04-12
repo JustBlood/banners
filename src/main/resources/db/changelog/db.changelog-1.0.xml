@@ -32,9 +32,12 @@
             <column name="tag_id" type="bigint">
                 <constraints nullable="false" notNullConstraintName="banner_tag_id_nn" />
             </column>
+            <column name="content" type="json">
+                <constraints nullable="false" notNullConstraintName="banner_content_nn" />
+            </column>
         </createTable>
         <addUniqueConstraint tableName="banner" columnNames="feature_id, tag_id"
-                             constraintName="banner_feature_tag_unq" /> <!--forIndexName="banner_feature_tag_idx"/>-->
+                             constraintName="banner_feature_tag_unq" />
         <createIndex tableName="banner" indexName="feature_tag_idx">
             <column name="tag_id" />
         </createIndex>

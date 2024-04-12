@@ -3,10 +3,10 @@ package ru.just.banners.repository;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import ru.just.banners.model.BannerModel;
 import ru.just.banners.model.BannerRecord;
 
-import static org.jooq.generated.public_.tables.Banner.BANNER;
+import static ru.just.banners.tables.Banner.BANNER;
+
 
 @RequiredArgsConstructor
 @Repository
