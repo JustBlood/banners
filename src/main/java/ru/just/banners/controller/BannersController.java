@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.just.banners.dto.BannerDto;
+import ru.just.banners.dto.BannerIdDto;
+import ru.just.banners.dto.CreateBannerDto;
 import ru.just.banners.service.BannersService;
 
 import java.util.Optional;
@@ -27,5 +26,35 @@ public class BannersController {
                                                     Optional<Boolean> useLastRevision) {
         BannerDto bannerDto = bannersService.findBannerByFeatureAndTag(featureId, tagId, useLastRevision.orElse(false));
         return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/banner")
+    public ResponseEntity<BannerDto> findBanners(@RequestParam(value = "feature_id", required = false)
+                                                 Optional<Long> featureId,
+                                                 @RequestParam(value = "tag_id", required = false)
+                                                 Optional<Long> tagId,
+                                                 @RequestParam(value = "offset", defaultValue = "0") Integer offset,
+                                                 @RequestParam(value = "limit", defaultValue = "20") Integer limit) {
+        BannerDto bannerDto = bannersService.findBanners(featureId, tagId, offset, limit);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/banner")
+    public ResponseEntity<BannerIdDto> findBanners(@RequestBody CreateBannerDto createBannerDto) {
+        BannerIdDto bannerDto = bannersService.createBanner(createBannerDto);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @PatchMapping("/banner/{bannerId}")
+    public ResponseEntity<Void> findBanners(@PathVariable Long bannerId,
+                                            @RequestBody CreateBannerDto patchBannerDto) {
+        bannersService.patchBanner(bannerId, patchBannerDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/banner/{bannerId}")
+    public ResponseEntity<Void> findBanners(@PathVariable Long bannerId) {
+        bannersService.deleteBanner(bannerId);
+        return ResponseEntity.ok().build();
     }
 }
