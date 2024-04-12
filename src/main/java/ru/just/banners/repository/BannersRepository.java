@@ -1,5 +1,6 @@
 package ru.just.banners.repository;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -13,10 +14,10 @@ import static ru.just.banners.tables.Banner.BANNER;
 public class BannersRepository {
     private final DSLContext jooq;
 
-    public BannerRecord findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
+    public @Nullable BannerRecord findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
         return jooq.select()
                 .from(BANNER)
                 .where(BANNER.FEATURE_ID.eq(featureId).and(BANNER.TAG_ID.eq(tagId)))
-                .fetchOne().into(BannerRecord.class);
+                .fetchOneInto(BannerRecord.class);
     }
 }
