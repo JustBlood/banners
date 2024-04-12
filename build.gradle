@@ -15,6 +15,14 @@ java {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated-sources/jooq'
+        }
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -31,6 +39,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.liquibase:liquibase-core'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'jakarta.persistence:jakarta.persistence-api'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
@@ -41,6 +51,7 @@ dependencies {
 }
 
 jooq {
+    version '3.19.7'
     configuration {
         jdbc {
             driver = 'org.postgresql.Driver'
