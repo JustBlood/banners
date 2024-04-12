@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: BANNERS-SERVICE
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/banners
+    username: postgres
+    password: admin
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+server:
+  port: 8080

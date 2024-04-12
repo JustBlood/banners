@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="20240412830" author="Porozov Kirill">
+        <createSequence sequenceName="user_id_seq" startValue="1" incrementBy="1" dataType="bigint" />
+        <createTable tableName="user">
+            <column name="user_id" type="bigint" defaultValueSequenceNext="user_id_seq">
+                <constraints primaryKey="true" primaryKeyName="house_id_pk"/>
+            </column>
+            <column name="token" type="varchar(250)">
+                <constraints unique="true" uniqueConstraintName="token_unq" />
+            </column>
+            <column name="is_admin" type="boolean" defaultValueBoolean="false" />
+        </createTable>
+
+        <createSequence sequenceName="banner_id_seq" startValue="1" incrementBy="1" dataType="bigint" />
+        <createTable tableName="banner">
+            <column name="banner_id" type="bigint" defaultValueSequenceNext="banner_id_seq">
+                <constraints primaryKey="true" primaryKeyName="banner_banner_id_pk" />
+            </column>
+            <column name="feature_id" type="bigint" >
+                <constraints nullable="false" notNullConstraintName="banner_feature_id_nn" />
+            </column>
+            <column name="tag_id" type="bigint">
+                <constraints nullable="false" notNullConstraintName="banner_tag_id_nn" />
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="banner" columnNames="feature_id, tag_id"
+                             constraintName="banner_feature_tag_unq" /> <!--forIndexName="banner_feature_tag_idx"/>-->
+        <createIndex tableName="banner" indexName="feature_tag_idx">
+            <column name="tag_id" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,4 +1,4 @@
-package ru.just.banners;
+package ru.just.banners.banners;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
