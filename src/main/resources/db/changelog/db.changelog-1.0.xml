@@ -44,7 +44,7 @@
                                  constraintName="banner_feature_tag_to_banner_fk"
                                  referencedTableName="banner"
                                  referencedColumnNames="banner_id, feature_id"
-                                 onDelete="CASCADE" />
+                                 onDelete="CASCADE" onUpdate="CASCADE" />
         <createIndex tableName="banner_feature_tag" indexName="banner_feature_tag_banner_idx">
             <column name="banner_id" />
         </createIndex>
