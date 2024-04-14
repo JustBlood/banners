@@ -42,20 +42,20 @@ public class BannersController {
     }
 
     @PostMapping("/banner")
-    public ResponseEntity<BannerIdDto> findBanners(@RequestBody CreateBannerDto createBannerDto) {
+    public ResponseEntity<BannerIdDto> createBanner(@RequestBody CreateBannerDto createBannerDto) {
         BannerIdDto bannerDto = bannersService.createBanner(createBannerDto);
         return new ResponseEntity<>(bannerDto, HttpStatus.OK);
     }
 
     @PatchMapping("/banner/{bannerId}")
-    public ResponseEntity<Void> findBanners(@PathVariable Long bannerId,
+    public ResponseEntity<Void> patchBanner(@PathVariable Long bannerId,
                                             @RequestBody CreateBannerDto patchBannerDto) {
         bannersService.patchBanner(bannerId, patchBannerDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/banner/{bannerId}")
-    public ResponseEntity<Void> findBanners(@PathVariable Long bannerId) {
+    public ResponseEntity<Void> deleteBanner(@PathVariable Long bannerId) {
         bannersService.deleteBanner(bannerId);
         return ResponseEntity.ok().build();
     }
