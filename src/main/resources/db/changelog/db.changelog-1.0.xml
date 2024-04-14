@@ -19,27 +19,31 @@
 
         <createSequence sequenceName="banner_id_seq" startValue="1" incrementBy="1" dataType="bigint" />
         <createTable tableName="banner">
-            <column name="banner_id" type="bigint" defaultValueSequenceNext="banner_id_seq">
-                <constraints primaryKey="true" primaryKeyName="banner_banner_id_pk" />
-            </column>
+            <column name="banner_id" type="bigint" defaultValueSequenceNext="banner_id_seq" />
+            <column name="feature_id" type="bigint" />
             <column name="content" type="json">
                 <constraints nullable="false" notNullConstraintName="banner_content_nn" />
             </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="true" >
+                <constraints nullable="false" notNullConstraintName="banner_is_active_nn" />
+            </column>
         </createTable>
+        <addPrimaryKey tableName="banner" columnNames="banner_id" constraintName="banner_banner_id_pk" />
+        <addUniqueConstraint tableName="banner" columnNames="feature_id, banner_id" constraintName="banner_banner_feature_unq"/>
 
         <createTable tableName="banner_feature_tag">
             <column name="feature_id" type="bigint" />
             <column name="tag_id" type="bigint" />
             <column name="banner_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="banner_feature_tag_banner_id_fk" />
+                <constraints nullable="false" />
             </column>
         </createTable>
         <addPrimaryKey tableName="banner_feature_tag" columnNames="feature_id, tag_id"
                        constraintName="banner_feature_tag_pk" />
-        <addForeignKeyConstraint baseTableName="banner_feature_tag" baseColumnNames="banner_id"
-                                 constraintName="banner_feature_tag_banner_id_fk"
+        <addForeignKeyConstraint baseTableName="banner_feature_tag" baseColumnNames="banner_id, feature_id"
+                                 constraintName="banner_feature_tag_to_banner_fk"
                                  referencedTableName="banner"
-                                 referencedColumnNames="banner_id" />
+                                 referencedColumnNames="banner_id, feature_id" />
         <createIndex tableName="banner_feature_tag" indexName="banner_feature_tag_banner_idx">
             <column name="banner_id" />
         </createIndex>
