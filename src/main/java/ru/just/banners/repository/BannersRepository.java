@@ -1,6 +1,7 @@
 package ru.just.banners.repository;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
@@ -27,7 +28,9 @@ public class BannersRepository {
     public @Nullable BannerRecord findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
         return jooq.select()
                 .from(BANNER_FEATURE_TAG.join(BANNER).using(BANNER.BANNER_ID))
-                .where(BANNER_FEATURE_TAG.FEATURE_ID.eq(featureId).and(BANNER_FEATURE_TAG.TAG_ID.eq(tagId)))
+                .where(BANNER_FEATURE_TAG.FEATURE_ID.eq(featureId))
+                .and(BANNER_FEATURE_TAG.TAG_ID.eq(tagId))
+                .and(BANNER.IS_ACTIVE.isTrue())
                 .fetchOneInto(BannerRecord.class);
     }
 
@@ -48,6 +51,7 @@ public class BannersRepository {
                 bannerModel.setFeatureId(record.getFeatureId());
                 bannerModel.setContent(record.getContent());
                 bannerModel.setTagIds(new ArrayList<>());
+                bannerModel.setIsActive(record.getIsActive());
                 return bannerModel;
             });
             model.getTagIds().add(record.getTagId());
@@ -86,7 +90,9 @@ public class BannersRepository {
             query.addValue(BANNER.CONTENT, JSON.valueOf(bannerModel.getContent()));
         if (Objects.nonNull(bannerModel.getIsActive()))
             query.addValue(BANNER.IS_ACTIVE, bannerModel.getIsActive());
-        query.execute();
+        if (query.execute() < 1) {
+            throw new EntityNotFoundException("Баннер не найден");
+        }
 
         jooq.deleteFrom(BANNER_FEATURE_TAG)
                 .where(BANNER_FEATURE_TAG.BANNER_ID.eq(bannerModel.getBannerId())

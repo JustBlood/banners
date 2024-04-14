@@ -13,4 +13,6 @@ public class BannerRecord {
     private Long tagId;
     @Column(name = "CONTENT")
     private String content;
+    @Column(name = "IS_ACTIVE")
+    private Boolean isActive;
 }

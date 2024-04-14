@@ -13,11 +13,13 @@ public class BannerDto {
     private Long featureId;
     private List<Long> tagIds;
     private String content;
+    private Boolean isActive;
 
     public BannerDto(BannerModel model) {
         this.bannerId = model.getBannerId();
         this.featureId = model.getFeatureId();
         this.tagIds = model.getTagIds();
         this.content = model.getContent();
+        this.isActive = model.getIsActive();
     }
 }
