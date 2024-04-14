@@ -2,17 +2,13 @@ package ru.just.banners.repository;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
 import org.jooq.Query;
-import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
-import ru.just.banners.dto.BannerIdDto;
 import ru.just.banners.dto.CreateBannerDto;
-import ru.just.banners.model.dao.BannerFeatureTagRecord;
-import ru.just.banners.model.domain.BannerModel;
 import ru.just.banners.model.dao.BannerRecord;
+import ru.just.banners.model.domain.BannerModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +20,7 @@ import static ru.just.banners.tables.BannerFeatureTag.BANNER_FEATURE_TAG;
 
 @RequiredArgsConstructor
 @Repository
+// FIXME: обработка ошибок
 public class BannersRepository {
     private final DSLContext jooq;
 
@@ -80,13 +77,36 @@ public class BannersRepository {
         return bannerId;
     }
 
-    public BannerIdDto patchBanner(Long bannerId, CreateBannerDto patchBannerDto) {
-        throw new NotImplementedException();
+    public void patchBanner(BannerModel bannerModel) {
+        var query = jooq.updateQuery(BANNER);
+        query.addConditions(BANNER.BANNER_ID.eq(bannerModel.getBannerId()));
+        if (Objects.nonNull(bannerModel.getFeatureId()))
+            query.addValue(BANNER.FEATURE_ID, bannerModel.getFeatureId());
+        if (Objects.nonNull(bannerModel.getContent()))
+            query.addValue(BANNER.CONTENT, JSON.valueOf(bannerModel.getContent()));
+        if (Objects.nonNull(bannerModel.getIsActive()))
+            query.addValue(BANNER.IS_ACTIVE, bannerModel.getIsActive());
+        query.execute();
+
+        jooq.deleteFrom(BANNER_FEATURE_TAG)
+                .where(BANNER_FEATURE_TAG.BANNER_ID.eq(bannerModel.getBannerId())
+                .and(BANNER_FEATURE_TAG.TAG_ID.notIn(bannerModel.getTagIds())))
+                .execute();
+
+        List<Query> insertQueries = bannerModel.getTagIds().stream()
+                .map(tagId ->
+                        jooq.insertInto(BANNER_FEATURE_TAG)
+                                .set(BANNER_FEATURE_TAG.BANNER_ID, bannerModel.getBannerId())
+                                .set(BANNER_FEATURE_TAG.FEATURE_ID, bannerModel.getFeatureId())
+                                .set(BANNER_FEATURE_TAG.TAG_ID, tagId)
+                                .onDuplicateKeyIgnore()
+                )
+                .collect(Collectors.toList());
+
+        jooq.batch(insertQueries).execute();
     }
 
     public void deleteBannerById(Long bannerId) {
-        // todo: on delete in changelog
-        // jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute();
-        throw new NotImplementedException();
+         jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute();
     }
 }

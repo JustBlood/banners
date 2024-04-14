@@ -4,11 +4,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.just.banners.dto.BannerDto;
-import ru.just.banners.dto.ContentBannerDto;
 import ru.just.banners.dto.BannerIdDto;
+import ru.just.banners.dto.ContentBannerDto;
 import ru.just.banners.dto.CreateBannerDto;
 import ru.just.banners.model.dao.BannerRecord;
+import ru.just.banners.model.domain.BannerModel;
 import ru.just.banners.repository.BannersRepository;
 
 import java.util.List;
@@ -34,12 +36,14 @@ public class BannersService {
                 .toList();
     }
 
+    @Transactional
     public BannerIdDto createBanner(CreateBannerDto createBannerDto) {
         return new BannerIdDto(bannersRepository.createBanner(createBannerDto));
     }
 
-    public BannerIdDto patchBanner(Long bannerId, CreateBannerDto patchBannerDto) {
-        return bannersRepository.patchBanner(bannerId, patchBannerDto);
+    @Transactional
+    public void patchBanner(Long bannerId, CreateBannerDto patchBannerDto) {
+        bannersRepository.patchBanner(new BannerModel(bannerId, patchBannerDto));
     }
 
     public void deleteBanner(Long bannerId) {
