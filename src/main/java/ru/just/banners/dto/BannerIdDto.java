@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class BannerIdDto {
-    private Long bannerId;
+    private final Long bannerId;
 }

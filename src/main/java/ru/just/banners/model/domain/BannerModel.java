@@ -1,4 +1,4 @@
-package ru.just.banners.model;
+package ru.just.banners.model.domain;
 
 import jakarta.persistence.Column;
 import lombok.Data;
