@@ -51,5 +51,9 @@
         <createIndex tableName="banner_feature_tag" indexName="banner_feature_tag_tag_idx">
             <column name="tag_id" />
         </createIndex>
+        <insert tableName="user">
+            <column name="token" value="Nt9Z2Gme5xdvX_UUNLeYOqVt4Q6dHuas"/>
+            <column name="is_admin" value="true" />
+        </insert>
     </changeSet>
 </databaseChangeLog>

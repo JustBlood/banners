@@ -5,9 +5,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.just.banners.model.dao.UserRecord;
@@ -31,7 +31,8 @@ public class TokenFilter extends OncePerRequestFilter {
         }
         UserRecord user = userRepository.getUserByToken(token);
         if (user == null) {
-            throw new UsernameNotFoundException("Токен не найден");
+            response.sendError(HttpStatus.UNAUTHORIZED.value());
+            return;
         }
         String authority = user.getIsAdmin() ? "ADMIN" : "USER";
         AuthenticationToken authenticationToken = new AuthenticationToken(token, user.getUserId(),
