@@ -42,6 +42,19 @@ public class BannersController {
         return new ResponseEntity<>(bannerDto, HttpStatus.OK);
     }
 
+    @GetMapping("/banner/{bannerId}/versions")
+    public ResponseEntity<List<BannerAuditDto>> findBannerVersions(@PathVariable Long bannerId) {
+        List<BannerAuditDto> bannerDto = bannersService.findBannerVersions(bannerId);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @PutMapping("/banner/{bannerId}/versions/{versionId}/rollback")
+    public ResponseEntity<BannerDto> rollbackBannerVersion(@PathVariable Long bannerId,
+                                                           @PathVariable Long versionId) {
+        BannerDto bannerDto = bannersService.rollbackBannerToVersion(bannerId, versionId);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
     @PostMapping("/banner")
     public ResponseEntity<BannerIdDto> createBanner(@Valid @RequestBody CreateBannerDto createBannerDto) {
         BannerIdDto bannerDto = bannersService.createBanner(createBannerDto);

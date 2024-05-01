@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.just.banners.controller.advice.FeatureTagNotUniqueException;
 import ru.just.banners.dto.*;
+import ru.just.banners.model.dao.BannerAuditModel;
+import ru.just.banners.model.dao.BannerFullModel;
 import ru.just.banners.model.dao.BannerRecord;
-import ru.just.banners.model.domain.BannerModel;
 import ru.just.banners.repository.BannersRepository;
 
 import java.util.List;
@@ -35,15 +37,34 @@ public class BannersService {
 
     @Transactional
     public BannerIdDto createBanner(CreateBannerDto createBannerDto) {
+        if (!bannersRepository.isFeatureTagPairsUnique(createBannerDto.getFeatureId(), createBannerDto.getTagIds())) {
+            throw new FeatureTagNotUniqueException(createBannerDto.getFeatureId(), createBannerDto.getTagIds());
+        }
         return new BannerIdDto(bannersRepository.createBanner(createBannerDto));
     }
 
     @Transactional
     public void patchBanner(Long bannerId, PatchBannerDto patchBannerDto) {
-        bannersRepository.patchBanner(new BannerModel(bannerId, patchBannerDto));
+        bannersRepository.patchBanner(new BannerFullModel(bannerId, patchBannerDto));
     }
 
     public void deleteBanner(Long bannerId) {
         bannersRepository.deleteBannerById(bannerId);
+    }
+
+    @Transactional
+    public BannerDto rollbackBannerToVersion(Long bannerId, Long versionId) {
+        BannerAuditModel bannerVersion = bannersRepository.findBannerVersion(versionId);
+        if (!bannerVersion.getBannerId().equals(bannerId)) {
+            throw new EntityNotFoundException("Указанная версия не принадлежит баннеру");
+        }
+        bannersRepository.patchBanner(new BannerFullModel(bannerVersion));
+        return new BannerDto(bannersRepository.findBannerById(bannerId));
+    }
+
+    public List<BannerAuditDto> findBannerVersions(Long bannerId) {
+        return bannersRepository.findBannerVersions(bannerId).stream()
+                .map(BannerAuditDto::new)
+                .toList();
     }
 }
