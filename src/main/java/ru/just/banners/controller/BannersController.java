@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.just.banners.dto.BannerDto;
-import ru.just.banners.dto.ContentBannerDto;
-import ru.just.banners.dto.BannerIdDto;
-import ru.just.banners.dto.CreateBannerDto;
+import ru.just.banners.dto.*;
 import ru.just.banners.service.BannersService;
 
 import java.util.List;
@@ -25,7 +22,7 @@ public class BannersController {
     public ResponseEntity<ContentBannerDto> findUserBanner(@RequestParam("tag_id") Long tagId,
                                                            @RequestParam("feature_id") Long featureId,
                                                            @RequestParam(value = "use_last_revision", required = false)
-                                                    Optional<Boolean> useLastRevision) {
+                                                               Optional<Boolean> useLastRevision) {
         ContentBannerDto contentBannerDto = bannersService.findBannerByFeatureAndTag(featureId, tagId, useLastRevision.orElse(false));
         return new ResponseEntity<>(contentBannerDto, HttpStatus.OK);
     }
@@ -38,6 +35,19 @@ public class BannersController {
                                                  @RequestParam(value = "offset", defaultValue = "0") Integer offset,
                                                  @RequestParam(value = "limit", defaultValue = "20") Integer limit) {
         List<BannerDto> bannerDto = bannersService.findBanners(featureId, tagId, offset, limit);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/banner/{bannerId}/versions")
+    public ResponseEntity<List<BannerAuditDto>> findBannerVersions(@PathVariable Long bannerId) {
+        List<BannerAuditDto> bannerDto = bannersService.findBannerVersions(bannerId);
+        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+    }
+
+    @PutMapping("/banner/{bannerId}/versions/{versionId}/rollback")
+    public ResponseEntity<BannerDto> rollbackBannerVersion(@PathVariable Long bannerId,
+                                                           @PathVariable Long versionId) {
+        BannerDto bannerDto = bannersService.rollbackBannerToVersion(bannerId, versionId);
         return new ResponseEntity<>(bannerDto, HttpStatus.OK);
     }
 
