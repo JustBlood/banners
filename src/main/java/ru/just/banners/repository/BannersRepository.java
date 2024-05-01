@@ -45,11 +45,11 @@ public class BannersRepository {
                         .eq(any(arrayAgg(BANNER_FEATURE_TAG.TAG_ID))))
                 .orElse(trueCondition());
         return jooq.select(
-                        BANNER.BANNER_ID,
-                        BANNER.FEATURE_ID,
+                        BANNER.BANNER_ID.as("BANNER_ID"),
+                        BANNER.FEATURE_ID.as("FEATURE_ID"),
                         arrayAgg(BANNER_FEATURE_TAG.TAG_ID).as("TAGS"),
-                        BANNER.CONTENT,
-                        BANNER.IS_ACTIVE
+                        BANNER.CONTENT.as("CONTENT"),
+                        BANNER.IS_ACTIVE.as("IS_ACTIVE")
                 )
                 .from(BANNER_FEATURE_TAG.join(BANNER).using(BANNER.BANNER_ID))
                 .groupBy(BANNER.BANNER_ID, BANNER.FEATURE_ID, md5(BANNER.CONTENT.cast(String.class)), BANNER.IS_ACTIVE)

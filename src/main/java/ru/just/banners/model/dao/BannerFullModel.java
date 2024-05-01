@@ -43,4 +43,7 @@ public class BannerFullModel {
         this.content = bannerVersion.getContent();
         this.isActive = bannerVersion.getIsActive();
     }
+
+    public BannerFullModel() {
+    }
 }
