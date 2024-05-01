@@ -2,12 +2,8 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="20240412830" author="Porozov Kirill">
         <createSequence sequenceName="user_id_seq" startValue="1" incrementBy="1" dataType="bigint" />
@@ -23,20 +19,41 @@
 
         <createSequence sequenceName="banner_id_seq" startValue="1" incrementBy="1" dataType="bigint" />
         <createTable tableName="banner">
-            <column name="banner_id" type="bigint" defaultValueSequenceNext="banner_id_seq">
-                <constraints primaryKey="true" primaryKeyName="banner_banner_id_pk" />
+            <column name="banner_id" type="bigint" defaultValueSequenceNext="banner_id_seq" />
+            <column name="feature_id" type="bigint" />
+            <column name="content" type="json">
+                <constraints nullable="false" notNullConstraintName="banner_content_nn" />
             </column>
-            <column name="feature_id" type="bigint" >
-                <constraints nullable="false" notNullConstraintName="banner_feature_id_nn" />
-            </column>
-            <column name="tag_id" type="bigint">
-                <constraints nullable="false" notNullConstraintName="banner_tag_id_nn" />
+            <column name="is_active" type="boolean" defaultValueBoolean="true" >
+                <constraints nullable="false" notNullConstraintName="banner_is_active_nn" />
             </column>
         </createTable>
-        <addUniqueConstraint tableName="banner" columnNames="feature_id, tag_id"
-                             constraintName="banner_feature_tag_unq" /> <!--forIndexName="banner_feature_tag_idx"/>-->
-        <createIndex tableName="banner" indexName="feature_tag_idx">
+        <addPrimaryKey tableName="banner" columnNames="banner_id" constraintName="banner_banner_id_pk" />
+        <addUniqueConstraint tableName="banner" columnNames="feature_id, banner_id" constraintName="banner_banner_feature_unq"/>
+
+        <createTable tableName="banner_feature_tag">
+            <column name="feature_id" type="bigint" />
+            <column name="tag_id" type="bigint" />
+            <column name="banner_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="banner_feature_tag" columnNames="feature_id, tag_id"
+                       constraintName="banner_feature_tag_pk" />
+        <addForeignKeyConstraint baseTableName="banner_feature_tag" baseColumnNames="banner_id, feature_id"
+                                 constraintName="banner_feature_tag_to_banner_fk"
+                                 referencedTableName="banner"
+                                 referencedColumnNames="banner_id, feature_id"
+                                 onDelete="CASCADE" onUpdate="CASCADE" />
+        <createIndex tableName="banner_feature_tag" indexName="banner_feature_tag_banner_idx">
+            <column name="banner_id" />
+        </createIndex>
+        <createIndex tableName="banner_feature_tag" indexName="banner_feature_tag_tag_idx">
             <column name="tag_id" />
         </createIndex>
+        <insert tableName="user">
+            <column name="token" value="Nt9Z2Gme5xdvX_UUNLeYOqVt4Q6dHuas"/>
+            <column name="is_admin" value="true" />
+        </insert>
     </changeSet>
 </databaseChangeLog>

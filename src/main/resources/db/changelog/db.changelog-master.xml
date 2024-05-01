@@ -2,13 +2,10 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include id="202404120900" file="db/changelog/db.changelog-1.0.xml" author="Porozov Kirill" />
+    <include id="202404120900" file="db.changelog-1.0.xml" author="Porozov Kirill" relativeToChangelogFile="true"/>
+    <include id="202405011330" file="db.changelog-1.1.xml" author="Porozov Kirill" relativeToChangelogFile="true" />
 
 </databaseChangeLog>
