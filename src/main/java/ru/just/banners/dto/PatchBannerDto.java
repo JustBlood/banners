@@ -9,7 +9,7 @@ import java.util.List;
 public class PatchBannerDto {
     private Long featureId;
     private List<Long> tagIds;
-    @ValidJson(message = "должен быть валидным JSON")
+    @ValidJson(message = "РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІР°Р»РёРґРЅС‹Рј JSON")
     private String content;
     private Boolean isActive;
 
