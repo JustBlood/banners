@@ -148,4 +148,10 @@ public class BannersRepository {
                 .where(BANNER_AUDIT.BANNER_AUDIT_ID.eq(versionId))
                 .fetchOneInto(BannerAuditModel.class);
     }
+
+    public boolean isFeatureTagPairsUnique(Long featureId, List<Long> tagIds) {
+        return jooq.selectFrom(BANNER_FEATURE_TAG)
+                .where(BANNER_FEATURE_TAG.FEATURE_ID.eq(featureId)
+                        .and(BANNER_FEATURE_TAG.TAG_ID.in(tagIds))).execute() == 0;
+    }
 }

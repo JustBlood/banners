@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.just.banners.controller.advice.FeatureTagNotUniqueException;
 import ru.just.banners.dto.*;
 import ru.just.banners.model.dao.BannerAuditModel;
 import ru.just.banners.model.dao.BannerFullModel;
@@ -36,6 +37,9 @@ public class BannersService {
 
     @Transactional
     public BannerIdDto createBanner(CreateBannerDto createBannerDto) {
+        if (!bannersRepository.isFeatureTagPairsUnique(createBannerDto.getFeatureId(), createBannerDto.getTagIds())) {
+            throw new FeatureTagNotUniqueException(createBannerDto.getFeatureId(), createBannerDto.getTagIds());
+        }
         return new BannerIdDto(bannersRepository.createBanner(createBannerDto));
     }
 

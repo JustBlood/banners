@@ -25,6 +25,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorMessage(e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = FeatureTagNotUniqueException.class)
+    public ResponseEntity<ErrorMessage> handleFeatureTagNotUniqueException(FeatureTagNotUniqueException e) {
+        String tags = String.join(",", e.getTagIds());
+        String errorMessage = String.format("Пара фича + тег уже существует. Пересмотрите список тегов: %s у фичи: %s",
+                tags, e.getFeatureId());
+        return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.CONFLICT);
+    }
+
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String errorMessage = "Тело запроса указано неверно";
