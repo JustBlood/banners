@@ -114,7 +114,9 @@ public class BannersRepository {
     }
 
     public void deleteBannerById(Long bannerId) {
-         jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute();
+         if (jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute() < 1) {
+             throw new EntityNotFoundException("Баннер не найден");
+         }
     }
 
     public List<BannerAuditModel> findBannerVersions(Long bannerId) {

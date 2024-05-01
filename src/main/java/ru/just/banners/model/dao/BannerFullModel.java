@@ -2,6 +2,7 @@ package ru.just.banners.model.dao;
 
 import jakarta.persistence.Column;
 import lombok.Data;
+import ru.just.banners.dto.PatchBannerDto;
 import ru.just.banners.dto.CreateBannerDto;
 
 import java.util.List;
@@ -20,6 +21,14 @@ public class BannerFullModel {
     private Boolean isActive;
 
     public BannerFullModel(Long bannerId, CreateBannerDto createBannerDto) {
+        this.bannerId = bannerId;
+        this.featureId = createBannerDto.getFeatureId();
+        this.tagIds = createBannerDto.getTagIds();
+        this.content = createBannerDto.getContent();
+        this.isActive = createBannerDto.getIsActive();
+    }
+
+    public BannerFullModel(Long bannerId, PatchBannerDto createBannerDto) {
         this.bannerId = bannerId;
         this.featureId = createBannerDto.getFeatureId();
         this.tagIds = createBannerDto.getTagIds();

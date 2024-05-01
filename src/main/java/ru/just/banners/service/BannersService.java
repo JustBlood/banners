@@ -40,7 +40,7 @@ public class BannersService {
     }
 
     @Transactional
-    public void patchBanner(Long bannerId, CreateBannerDto patchBannerDto) {
+    public void patchBanner(Long bannerId, PatchBannerDto patchBannerDto) {
         bannersRepository.patchBanner(new BannerFullModel(bannerId, patchBannerDto));
     }
 
