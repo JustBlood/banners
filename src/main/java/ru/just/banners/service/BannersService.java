@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.just.banners.dto.BannerDto;
-import ru.just.banners.dto.BannerIdDto;
-import ru.just.banners.dto.ContentBannerDto;
-import ru.just.banners.dto.CreateBannerDto;
+import ru.just.banners.dto.*;
 import ru.just.banners.model.dao.BannerRecord;
 import ru.just.banners.model.domain.BannerModel;
 import ru.just.banners.repository.BannersRepository;
@@ -42,7 +39,7 @@ public class BannersService {
     }
 
     @Transactional
-    public void patchBanner(Long bannerId, CreateBannerDto patchBannerDto) {
+    public void patchBanner(Long bannerId, PatchBannerDto patchBannerDto) {
         bannersRepository.patchBanner(new BannerModel(bannerId, patchBannerDto));
     }
 
