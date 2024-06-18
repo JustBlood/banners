@@ -3,6 +3,7 @@ package ru.just.banners.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.just.banners.controller.advice.FeatureTagNotUniqueException;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public class BannersService {
     private final BannersRepository bannersRepository;
 
-    // todo: обработка useLastRevision после добавления кеширования
+    @Cacheable(cacheNames = "banner", condition = "!#useLastRevision.booleanValue()")
     public ContentBannerDto findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
         BannerRecord bannerRecord = Optional.ofNullable(bannersRepository
                 .findBannerByFeatureAndTag(featureId, tagId, useLastRevision))
