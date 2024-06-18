@@ -19,7 +19,7 @@ import java.util.Optional;
 public class BannersController {
     private final BannersService bannersService;
 
-    @GetMapping("/user_banner")
+    @GetMapping(value = "/user_banner")
     public ResponseEntity<String> findUserBanner(@RequestParam("tag_id") Long tagId,
                                                  @RequestParam("feature_id") Long featureId,
                                                  @RequestParam(value = "use_last_revision", required = false)
