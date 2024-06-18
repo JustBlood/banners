@@ -3,6 +3,9 @@ package ru.just.banners.controller.advice;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -17,8 +20,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorMessage> handleInternalServerException(Exception e) {
@@ -28,9 +34,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = FeatureTagNotUniqueException.class)
     public ResponseEntity<ErrorMessage> handleFeatureTagNotUniqueException(FeatureTagNotUniqueException e) {
         String tags = String.join(",", e.getTagIds());
-        String errorMessage = String.format("Пара фича + тег уже существует. Пересмотрите список тегов: %s у фичи: %s",
-                tags, e.getFeatureId());
+        String errorMessage = messageSource.getMessage(
+                "error.featureTagPairExists",
+                new Object[]{tags, e.getFeatureId()},
+                LocaleContextHolder.getLocale()
+        );
         return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value = IncorrectArgumentsException.class)
+    public ResponseEntity<ErrorMessage> handleIncorrectArgumentsException(IncorrectArgumentsException e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(e.getMessage()).append(".");
+        for (var entry : e.getArgumentToException().entrySet()) {
+            sb.append(" ").append(entry.getKey()).append(": ").append(entry.getValue()).append(";");
+        }
+        return new ResponseEntity<>(new ErrorMessage(sb.toString()), HttpStatus.CONFLICT);
     }
 
     @Override
@@ -61,8 +80,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String errorMessage = String.format("Обязательный параметр запроса '%s' (тип %s) не указан",
-                ex.getParameterName(), ex.getParameterType());
+        String errorMessage = messageSource.getMessage("error.requiredArgNotSpecified",
+                new Object[]{ex.getParameterName(), ex.getParameterType()},
+                LocaleContextHolder.getLocale());
         return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.BAD_REQUEST);
     }
 }

@@ -3,13 +3,16 @@ package ru.just.banners.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.just.banners.controller.advice.IncorrectArgumentsException;
 import ru.just.banners.dto.*;
 import ru.just.banners.service.BannersService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -18,12 +21,13 @@ import java.util.Optional;
 @Slf4j
 public class BannersController {
     private final BannersService bannersService;
+    private final MessageSource messageSource;
 
     @GetMapping(value = "/user_banner")
     public ResponseEntity<String> findUserBanner(@RequestParam("tag_id") Long tagId,
                                                  @RequestParam("feature_id") Long featureId,
                                                  @RequestParam(value = "use_last_revision", required = false)
-                                                     Optional<Boolean> useLastRevision) {
+                                                 Optional<Boolean> useLastRevision) {
         ContentBannerDto contentBannerDto = bannersService.findBannerByFeatureAndTag(featureId, tagId,
                 useLastRevision.orElse(false));
         return new ResponseEntity<>(contentBannerDto.getContent(), HttpStatus.OK);
@@ -31,13 +35,13 @@ public class BannersController {
 
     @GetMapping("/banner")
     public ResponseEntity<List<BannerDto>> findBanners(@RequestParam(value = "feature_id", required = false)
-                                                           Optional<Long> featureId,
+                                                       Optional<Long> featureId,
                                                        @RequestParam(value = "tag_id", required = false)
-                                                           Optional<Long> tagId,
+                                                       Optional<Long> tagId,
                                                        @RequestParam(value = "offset", defaultValue = "0")
-                                                           Integer offset,
+                                                       Integer offset,
                                                        @RequestParam(value = "limit", defaultValue = "20")
-                                                           Integer limit) {
+                                                       Integer limit) {
         List<BannerDto> bannerDto = bannersService.findBanners(featureId, tagId, offset, limit);
         return new ResponseEntity<>(bannerDto, HttpStatus.OK);
     }
@@ -71,6 +75,18 @@ public class BannersController {
     @DeleteMapping("/banner/{bannerId}")
     public ResponseEntity<Void> deleteBanner(@PathVariable Long bannerId) {
         bannersService.deleteBanner(bannerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/banner")
+    public ResponseEntity<Void> deleteBannerByFeatureOrTag(@RequestParam(value = "feature_id", required = false) Optional<Long> featureId,
+                                                           @RequestParam(value = "tag_id", required = false) Optional<Long> tagId,
+                                                           Locale locale) throws IncorrectArgumentsException {
+        if (featureId.isPresent() && tagId.isPresent())
+            throw new IncorrectArgumentsException(messageSource.getMessage("error.deletingBothTagAndFeature", null, locale));
+        if (featureId.isEmpty() && tagId.isEmpty())
+            throw new IncorrectArgumentsException(messageSource.getMessage("error.deletingMissingParameters", null, locale));
+        bannersService.deleteBannerByFeatureOrTag(featureId, tagId);
         return ResponseEntity.noContent().build();
     }
 }
