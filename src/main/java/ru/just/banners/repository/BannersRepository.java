@@ -169,4 +169,14 @@ public class BannersRepository {
                         .where(BANNER_FEATURE_TAG.TAG_ID.eq(tagId))))
                 .execute();
     }
+
+    public void deleteNBannersByFlag(Integer countForDeleteInBatch) {
+        int deletedRecords;
+        do {
+            deletedRecords = jooq.deleteFrom(BANNER)
+                    .where(BANNER.IS_DELETED.isTrue())
+                    .limit(countForDeleteInBatch)
+                    .execute();
+        } while (deletedRecords == countForDeleteInBatch);
+    }
 }

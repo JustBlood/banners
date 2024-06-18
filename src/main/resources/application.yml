@@ -8,3 +8,6 @@ spring:
     password: admin
 server:
   port: 8080
+banners:
+  batch:
+    delete: 50
