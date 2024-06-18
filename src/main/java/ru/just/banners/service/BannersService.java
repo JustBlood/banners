@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.just.banners.controller.advice.FeatureTagNotUniqueException;
@@ -21,12 +23,14 @@ import java.util.Optional;
 @Slf4j
 public class BannersService {
     private final BannersRepository bannersRepository;
+    private final MessageSource messageSource;
 
     @Cacheable(cacheNames = "banner", condition = "!#useLastRevision.booleanValue()")
     public ContentBannerDto findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
         BannerRecord bannerRecord = Optional.ofNullable(bannersRepository
-                .findBannerByFeatureAndTag(featureId, tagId, useLastRevision))
-                .orElseThrow(() -> new EntityNotFoundException("Баннер не найден"));
+                        .findBannerByFeatureAndTag(featureId, tagId))
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage(
+                        "error.bannerNotFound", null, LocaleContextHolder.getLocale())));
         return new ContentBannerDto(bannerRecord);
     }
 
@@ -57,7 +61,8 @@ public class BannersService {
     public BannerDto rollbackBannerToVersion(Long bannerId, Long versionId) {
         BannerAuditModel bannerVersion = bannersRepository.findBannerVersion(versionId);
         if (!bannerVersion.getBannerId().equals(bannerId)) {
-            throw new EntityNotFoundException("Указанная версия не принадлежит баннеру");
+            throw new EntityNotFoundException(messageSource.getMessage(
+                    "error.notThisBannerVersion", null, LocaleContextHolder.getLocale()));
         }
         bannersRepository.patchBanner(new BannerFullModel(bannerVersion));
         return new BannerDto(bannersRepository.findBannerById(bannerId));
@@ -67,5 +72,10 @@ public class BannersService {
         return bannersRepository.findBannerVersions(bannerId).stream()
                 .map(BannerAuditDto::new)
                 .toList();
+    }
+
+    public void deleteBannerByFeatureOrTag(Optional<Long> featureId, Optional<Long> tagId) {
+        featureId.ifPresent(bannersRepository::markBannersToDeleteWithFeatureIdEquals);
+        tagId.ifPresent(bannersRepository::markBannersToDeleteWithTagIdEquals);
     }
 }

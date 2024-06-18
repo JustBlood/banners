@@ -26,11 +26,10 @@ import static ru.just.banners.tables.BannerFeatureTag.BANNER_FEATURE_TAG;
 
 @RequiredArgsConstructor
 @Repository
-// FIXME: обработка ошибок
 public class BannersRepository {
     private final DSLContext jooq;
 
-    public @Nullable BannerRecord findBannerByFeatureAndTag(Long featureId, Long tagId, Boolean useLastRevision) {
+    public @Nullable BannerRecord findBannerByFeatureAndTag(Long featureId, Long tagId) {
         return jooq.select()
                 .from(BANNER_FEATURE_TAG.join(BANNER).using(BANNER.BANNER_ID))
                 .where(BANNER_FEATURE_TAG.FEATURE_ID.eq(featureId))
@@ -97,7 +96,7 @@ public class BannersRepository {
 
         jooq.deleteFrom(BANNER_FEATURE_TAG)
                 .where(BANNER_FEATURE_TAG.BANNER_ID.eq(bannerModel.getBannerId())
-                .and(BANNER_FEATURE_TAG.TAG_ID.notIn(bannerModel.getTagIds())))
+                        .and(BANNER_FEATURE_TAG.TAG_ID.notIn(bannerModel.getTagIds())))
                 .execute();
 
         List<Query> insertQueries = bannerModel.getTagIds().stream()
@@ -114,9 +113,9 @@ public class BannersRepository {
     }
 
     public void deleteBannerById(Long bannerId) {
-         if (jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute() < 1) {
-             throw new EntityNotFoundException("Баннер не найден");
-         }
+        if (jooq.delete(BANNER).where(BANNER.BANNER_ID.eq(bannerId)).execute() < 1) {
+            throw new EntityNotFoundException("Баннер не найден");
+        }
     }
 
     public List<BannerAuditModel> findBannerVersions(Long bannerId) {
@@ -131,11 +130,11 @@ public class BannersRepository {
 
     public BannerFullModel findBannerById(Long bannerId) {
         return jooq.select(
-                    BANNER.BANNER_ID,
-                    BANNER.FEATURE_ID,
-                    arrayAgg(BANNER_FEATURE_TAG.TAG_ID).as("TAGS"),
-                    BANNER.CONTENT,
-                    BANNER.IS_ACTIVE
+                        BANNER.BANNER_ID,
+                        BANNER.FEATURE_ID,
+                        arrayAgg(BANNER_FEATURE_TAG.TAG_ID).as("TAGS"),
+                        BANNER.CONTENT,
+                        BANNER.IS_ACTIVE
                 )
                 .from(BANNER_FEATURE_TAG.join(BANNER).using(BANNER.BANNER_ID))
                 .where(BANNER.BANNER_ID.eq(bannerId))
@@ -153,5 +152,31 @@ public class BannersRepository {
         return jooq.selectFrom(BANNER_FEATURE_TAG)
                 .where(BANNER_FEATURE_TAG.FEATURE_ID.eq(featureId)
                         .and(BANNER_FEATURE_TAG.TAG_ID.in(tagIds))).execute() == 0;
+    }
+
+    public void markBannersToDeleteWithFeatureIdEquals(Long featureId) {
+        jooq.update(BANNER)
+                .set(BANNER.IS_DELETED, true)
+                .where(BANNER.FEATURE_ID.eq(featureId))
+                .execute();
+    }
+
+    public void markBannersToDeleteWithTagIdEquals(Long tagId) {
+        jooq.update(BANNER)
+                .set(BANNER.IS_DELETED, true)
+                .where(BANNER.BANNER_ID.in(select(BANNER_FEATURE_TAG.BANNER_ID)
+                        .from(BANNER_FEATURE_TAG)
+                        .where(BANNER_FEATURE_TAG.TAG_ID.eq(tagId))))
+                .execute();
+    }
+
+    public void deleteNBannersByFlag(Integer countForDeleteInBatch) {
+        int deletedRecords;
+        do {
+            deletedRecords = jooq.deleteFrom(BANNER)
+                    .where(BANNER.IS_DELETED.isTrue())
+                    .limit(countForDeleteInBatch)
+                    .execute();
+        } while (deletedRecords == countForDeleteInBatch);
     }
 }
