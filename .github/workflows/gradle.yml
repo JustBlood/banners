@@ -20,6 +20,21 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      db:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: banners
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        options: >-
+          --health-cmd="pg_isready -U postgres -d banners"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -28,13 +43,20 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Wait for PostgreSQL
+      run: |
+        echo "Waiting for PostgreSQL to be ready..."
+        while ! pg_isready -h localhost -p 5432 -U your_database_user -d your_database_name; do
+          sleep 1
+        done
+
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./gradlew build -x test
 
     - name: Run tests with Gradle Wrapper
       run: ./gradlew test
