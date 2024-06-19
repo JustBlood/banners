@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.google.guava:guava:33.2.1-jre'
+    implementation 'com.google.guava:guava:33.2.1-jre'
     implementation 'org.json:json:20240303'
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springframework.boot:spring-boot-starter-security'
