@@ -13,17 +13,17 @@ VALUES ('token1', false),
        ('admin-token', true);
 
 -- Insert 10 banners
-INSERT INTO public.banner (feature_id, content, is_active, is_deleted)
-VALUES (1, '{"message": "Banner 1"}', true, false),
-       (2, '{"message": "Banner 2"}', true, false),
-       (3, '{"message": "Banner 3"}', true, false),
-       (4, '{"message": "Banner 4"}', true, false),
-       (5, '{"message": "Banner 5"}', true, true),
-       (6, '{"message": "Banner 6"}', false, false),
-       (7, '{"message": "Banner 7"}', false, false),
-       (8, '{"message": "Banner 8"}', false, false),
-       (9, '{"message": "Banner 9"}', false, false),
-       (10, '{"message": "Banner 10"}', false, true);
+INSERT INTO public.banner (banner_id, feature_id, content, is_active, is_deleted)
+VALUES (1, 1, '{"message": "Banner 1"}', true, false),
+       (2, 2, '{"message": "Banner 2"}', true, false),
+       (3, 3, '{"message": "Banner 3"}', true, false),
+       (4, 4, '{"message": "Banner 4"}', true, false),
+       (5, 5, '{"message": "Banner 5"}', true, true),
+       (6, 6, '{"message": "Banner 6"}', false, false),
+       (7, 7, '{"message": "Banner 7"}', false, false),
+       (8, 8, '{"message": "Banner 8"}', false, false),
+       (9, 9, '{"message": "Banner 9"}', false, false),
+       (10, 10, '{"message": "Banner 10"}', false, true);
 
 -- Optionally, you can add some feature-tag associations
 INSERT INTO public.banner_feature_tag (feature_id, tag_id, banner_id)
