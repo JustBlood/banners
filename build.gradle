@@ -1,5 +1,20 @@
 import nu.studer.gradle.jooq.JooqEdition
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
+import org.testcontainers.containers.PostgreSQLContainer
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        //      ...
+        //      Required dependencies to start testcontainers and do the migration during the build.
+        classpath 'org.testcontainers:postgresql:1.19.3'
+        classpath 'org.liquibase:liquibase-core:4.24.0'
+    }
+}
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.4'
@@ -48,6 +63,9 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
@@ -59,39 +77,25 @@ dependencies {
     liquibaseRuntime 'org.postgresql:postgresql'
 }
 
-jooq {
-    version '3.18.4'
-    edition = JooqEdition.OSS
-    configurations {
-        main {
-            generationTool {
-                jdbc {
-                    driver = 'org.postgresql.Driver'
-                    url = 'jdbc:postgresql://localhost:5432/banners'
-                    user = 'postgres'
-                    password = 'admin'
-                }
+// Here we register service for providing our database during the build.
+Provider<PostgresService> dbContainerProvider = project.getGradle()
+        .getSharedServices()
+        .registerIfAbsent("postgres", PostgresService.class, {})
 
-                generator {
-                    name = 'org.jooq.codegen.DefaultGenerator'
-                    database {
-                        name = 'org.jooq.meta.postgres.PostgresDatabase'
-                        inputSchema = 'public'
-                    }
-                    generate {
-                        deprecated = false
-                        records = true
-                        immutablePojos = true
-                        fluentSetters = true
-                    }
-                    target {
-                        packageName = 'ru.just.banners'
-                        directory = 'build/generated-src/jooq/main'  // default (can be omitted)
-                    }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-                }
-            }
-        }
+def dbContainer = dbContainerProvider.get().container
+String dbUsername = dbContainer.username
+String dbPassword = dbContainer.password
+String jdbcUrl = dbContainer.jdbcUrl
+
+test {
+    useJUnitPlatform()
+
+    //  This is only necessary if you want to reuse container for the tests.
+    usesService dbContainerProvider
+    doFirst {
+        systemProperty('spring.datasource.url', jdbcUrl)
+        systemProperty('spring.datasource.username', dbUsername)
+        systemProperty('spring.datasource.password', dbPassword)
     }
 }
 
@@ -99,13 +103,80 @@ liquibase {
     activities {
         update {
             changelogFile 'src/main/resources/db/changelog/db.changelog-master.xml'
-            url 'jdbc:postgresql://localhost:5432/banners'
-            username 'postgres'
-            password 'admin'
+            url jdbcUrl
+            username dbUsername
+            password dbPassword
         }
     }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+afterEvaluate {
+//  For jOOQ to run we always need for flyway to be completed before.
+    generateJooq.dependsOn update
+
+    generateJooq.doFirst {
+        jooq {
+            configurations {
+                main {
+                    generationTool {
+                        jdbc {
+                            driver = "org.postgresql.Driver"
+                            url = jdbcUrl
+                            user = dbUsername
+                            password = dbPassword
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+jooq {
+    version = dependencyManagement.importedProperties['jooq.version']
+    edition = JooqEdition.OSS
+    configurations {
+        main {
+            generationTool {
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'public'
+                    }
+                    target {
+                        packageName = 'ru.just.banners'
+                        directory = 'build/generated-src/jooq/main'
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Build service for providing database container.
+ */
+abstract class PostgresService implements BuildService<BuildServiceParameters.None>, AutoCloseable {
+    private final PostgreSQLContainer container;
+
+    PostgresService() {
+    //        Services are initialized lazily, on first request to them, so we start container immediately.
+        container = new PostgreSQLContainer("postgres:16-alpine")
+                .withReuse(false)
+                .withDatabaseName("banners")
+                .withUsername("postgres")
+                .withPassword("admin");
+        container.start()
+    }
+
+    @Override
+    void close() {
+    //        Ensure to stop container in the end
+        container.stop()
+    }
+
+    PostgreSQLContainer getContainer() {
+        return container
+    }
 }
