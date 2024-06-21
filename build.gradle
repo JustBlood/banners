@@ -15,6 +15,7 @@ buildscript {
         classpath 'org.liquibase:liquibase-core:4.24.0'
     }
 }
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.4'
@@ -25,6 +26,12 @@ plugins {
 
 group = 'ru.just'
 version = '0.0.1-SNAPSHOT'
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 
 java {
     sourceCompatibility = '21'

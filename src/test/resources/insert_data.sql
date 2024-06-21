@@ -1,4 +1,5 @@
 -- Insert 10 users
+SELECT setval('user_id_seq', 50);
 INSERT INTO public."user" (token, is_admin)
 VALUES ('token1', false),
        ('token2', false),
@@ -13,6 +14,7 @@ VALUES ('token1', false),
        ('admin-token', true);
 
 -- Insert 10 banners
+SELECT setval('banner_id_seq', 50);
 INSERT INTO public.banner (banner_id, feature_id, content, is_active, is_deleted)
 VALUES (1, 1, '{"message": "Banner 1"}', true, false),
        (2, 2, '{"message": "Banner 2"}', true, false),
