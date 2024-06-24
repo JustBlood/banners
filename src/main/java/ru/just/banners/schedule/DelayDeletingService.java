@@ -18,7 +18,8 @@ public class DelayDeletingService {
 
     @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
     @Transactional
-    void deleteBannersByFlag() {
+
+    public void deleteBannersByFlag() {
         bannersRepository.deleteNBannersByFlag(countForDeleteInBatch);
     }
 }

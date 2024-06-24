@@ -1,11 +1,13 @@
 package ru.just.banners.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.just.banners.model.dao.BannerFullModel;
 
 import java.util.List;
 
+@NoArgsConstructor
 @Getter
 @Setter
 public class BannerDto {

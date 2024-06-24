@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = messageSource.getMessage(
                 "error.featureTagPairExists",
                 new Object[]{tags, e.getFeatureId()},
-                LocaleContextHolder.getLocale()
+                Locale.of("ru_RU")
         );
         return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.CONFLICT);
     }

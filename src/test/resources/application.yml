@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: BANNERS-SERVICE
+server:
+  port: 8080
+banners:
+  batch:
+    delete: 50

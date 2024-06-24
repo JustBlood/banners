@@ -62,7 +62,7 @@ public class BannersController {
     @PostMapping("/banner")
     public ResponseEntity<BannerIdDto> createBanner(@Valid @RequestBody CreateBannerDto createBannerDto) {
         BannerIdDto bannerDto = bannersService.createBanner(createBannerDto);
-        return new ResponseEntity<>(bannerDto, HttpStatus.OK);
+        return new ResponseEntity<>(bannerDto, HttpStatus.CREATED);
     }
 
     @PatchMapping("/banner/{bannerId}")
