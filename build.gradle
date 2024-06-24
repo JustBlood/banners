@@ -96,8 +96,10 @@ String dbPassword = dbContainer.password
 String jdbcUrl = dbContainer.jdbcUrl
 
 task copyMessages(type: Copy) {
-    from "${layout.buildDirectory}/resources/main/messages"
-    into "${layout.buildDirectory}/resources/test/messages"
+    dependsOn processResources
+
+    from "${layout.buildDirectory.asFile.get()}/resources/main/messages"
+    into "${layout.buildDirectory.asFile.get()}/resources/test/messages"
 }
 
 test {
