@@ -38,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = messageSource.getMessage(
                 "error.featureTagPairExists",
                 new Object[]{tags, e.getFeatureId()},
-                Locale.of("ru")
+                Locale.of("ru_RU")
         );
         return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.CONFLICT);
     }

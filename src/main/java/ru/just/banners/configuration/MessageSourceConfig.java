@@ -12,7 +12,7 @@ public class MessageSourceConfig {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
+        messageSource.setBasename("classpath:messages/banners");
         messageSource.setDefaultLocale(Locale.of("ru"));
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
