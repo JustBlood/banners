@@ -95,14 +95,14 @@ String dbUsername = dbContainer.username
 String dbPassword = dbContainer.password
 String jdbcUrl = dbContainer.jdbcUrl
 
-//task copyMessages(type: Copy) {
-//    dependsOn processResources
-//
-//    from "${projectDir}/src/main/resources/messages"
-//    into "${projectDir}/src/test/resources/messages"
-//}
-//
-//processTestResources.dependsOn(copyMessages)
+task copyMessages(type: Copy) {
+    dependsOn processResources
+
+    from "${projectDir}/src/main/resources/messages"
+    into "${projectDir}/src/test/resources/messages"
+}
+
+processTestResources.dependsOn(copyMessages)
 
 test {
     useJUnitPlatform()
