@@ -98,7 +98,7 @@ String jdbcUrl = dbContainer.jdbcUrl
 task copyMessages(type: Copy) {
     dependsOn processResources
 
-    from "${layout.buildDirectory.asFile.get()}/resources/main/messages"
+    from "${projectDir}/src/main/resources/messages"
     into "${layout.buildDirectory.asFile.get()}/resources/test/messages"
 }
 
