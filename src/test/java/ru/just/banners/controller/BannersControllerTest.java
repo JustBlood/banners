@@ -23,7 +23,6 @@ import ru.just.banners.schedule.DelayDeletingService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,6 +117,7 @@ class BannersControllerTest {
         createBannerDto.setFeatureId(featureId);
         createBannerDto.setTagIds(tagIds);
         createBannerDto.setContent(content);
+
 
         String response = mockMvc.perform(post("/api/v1/banner")
                         .header(HttpHeaders.CONTENT_TYPE, "application/json")
