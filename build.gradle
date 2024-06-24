@@ -102,8 +102,9 @@ task copyMessages(type: Copy) {
     into "${projectDir}/src/test/resources/messages"
 }
 
+processTestResources.dependsOn(copyMessages)
+
 test {
-    dependsOn copyMessages
     useJUnitPlatform()
 
     //  This is only necessary if you want to reuse container for the tests.
