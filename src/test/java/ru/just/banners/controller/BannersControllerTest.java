@@ -110,8 +110,9 @@ class BannersControllerTest {
         long featureId = 1L;
         List<Long> tagIds = List.of(1L);
         String allTagIds = tagIds.stream().map(Object::toString).collect(Collectors.joining(","));
-        String expectedMessage = messageSource.getMessage(
-                "error.featureTagPairExists", new Object[]{allTagIds, featureId}, Locale.of("ru_RU"));
+//        String expectedMessage = messageSource.getMessage(
+//                "error.featureTagPairExists", new Object[]{allTagIds, featureId}, Locale.of("ru_RU"));
+        String expectedMessage = "Пара фича + тег уже существует. Пересмотрите список тегов: " + allTagIds + " у фичи: " + featureId;
         String content = "{\"message\": \"Banner 1\"}";
         CreateBannerDto createBannerDto = new CreateBannerDto();
         createBannerDto.setFeatureId(featureId);
@@ -135,8 +136,9 @@ class BannersControllerTest {
     @Test
     void deleteBanner_whenNoBannerExists_statusNotFound() {
         long bannerId = 999;
-        String expectedMessage = messageSource.getMessage(
-                "error.bannerNotFound", null, Locale.of("ru_RU"));
+//        String expectedMessage = messageSource.getMessage(
+//                "error.bannerNotFound", null, Locale.of("ru_RU"));
+        String expectedMessage = "Баннер не найден";
 
         String response = mockMvc.perform(delete("/api/v1/banner/" + bannerId)
                         .header(HttpHeaders.CONTENT_TYPE, "application/json")
