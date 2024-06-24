@@ -40,7 +40,7 @@ jobs:
     - name: List build/resources/test directory after tests
       run: |
         echo "Listing build/resources/test directory after tests:"
-        ls -alh
+        ls -alh build
 
   dependency-submission:
 
