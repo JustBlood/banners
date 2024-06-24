@@ -101,6 +101,7 @@ task copyMessages(type: Copy) {
 }
 
 test {
+    dependsOn copyMessages
     useJUnitPlatform()
 
     //  This is only necessary if you want to reuse container for the tests.
